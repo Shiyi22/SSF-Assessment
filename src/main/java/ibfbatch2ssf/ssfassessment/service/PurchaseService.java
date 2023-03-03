@@ -2,6 +2,7 @@ package ibfbatch2ssf.ssfassessment.service;
 
 import ibfbatch2ssf.ssfassessment.model.*;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -9,13 +10,14 @@ import java.util.List;
 @Service
 public class PurchaseService {
 
-    // autowire repo 
+    // autowire Quotation service 
+    @Autowired
+    private QuotationService qSvc; 
 
     // method to perform aggregation at cart level 
     public Cart aggregate(Cart cart, Item item) {
 
         List<Item> contents = cart.getContents(); 
-        System.out.println(contents); 
 
         // loop through the list to see if there are similar item name already existing in the cart 
         for (int i = 0; i < contents.size(); i++) {
@@ -33,6 +35,20 @@ public class PurchaseService {
         // if reach this step it means itemName != all names in the cart
         cart.addItemToCart(item);
         return cart; 
+    }
+
+    // create invoice
+    public Invoice createInvoice(Quotation quote, Delivery delivery, Cart cart) {
+
+        Invoice invoice = new Invoice(); 
+        invoice.setInvoiceId(quote.getQuoteId()); 
+        invoice.setDelivery(delivery);
+
+        // total cost calculation 
+        Float cost = qSvc.calculateCost(quote, cart); 
+        invoice.setTotal(cost);
+
+        return invoice; 
     }
     
 }

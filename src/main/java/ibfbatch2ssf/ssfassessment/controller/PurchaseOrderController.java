@@ -1,5 +1,7 @@
 package ibfbatch2ssf.ssfassessment.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -10,7 +12,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import ibfbatch2ssf.ssfassessment.model.Cart;
 import ibfbatch2ssf.ssfassessment.model.Delivery;
 import ibfbatch2ssf.ssfassessment.model.Item;
-import ibfbatch2ssf.ssfassessment.service.PurchaseService;
+import ibfbatch2ssf.ssfassessment.model.Quotation;
+import ibfbatch2ssf.ssfassessment.model.Invoice;
+import ibfbatch2ssf.ssfassessment.service.*;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
@@ -20,6 +24,9 @@ public class PurchaseOrderController {
     // autowire service
     @Autowired
     private PurchaseService purchaseSvc;
+
+    @Autowired
+    private QuotationService quotationSvc; 
 
     // landing page = view1
     @GetMapping(path={"/", "view1.html"})
@@ -52,6 +59,7 @@ public class PurchaseOrderController {
         }
         // perform aggregation 
         cart = purchaseSvc.aggregate(cart, item); 
+        System.out.println(">>> cart contents after aggregation: " + cart); 
         session.setAttribute("cart", cart);
         session.setAttribute("item", item);
 
@@ -92,7 +100,7 @@ public class PurchaseOrderController {
     }
 
     @PostMapping("/quotation")
-    public String postAddress(@Valid Delivery delivery, BindingResult result, HttpSession session, Model model) { 
+    public String postAddress(@Valid Delivery delivery, BindingResult result, HttpSession session, Model model) throws Exception { 
 
         // check for delivery details errors 
         if (result.hasErrors()) {
@@ -100,10 +108,28 @@ public class PurchaseOrderController {
             return "view2"; 
         }
 
-        // if no error, continue 
-
-
+        // if no error, submit to POApp 
+        // create List<String> as the list of items from customer cart 
+        Cart cart = (Cart) session.getAttribute("cart"); 
+        List<String> items = quotationSvc.getList(cart); 
+        System.out.println(items);
+        
         // make HTTP call to get quotation (svc)
+        Quotation quote = quotationSvc.getQuotations(items); 
+
+        // check for error message
+        // if (quote.getQuoteId().isEmpty()) {
+
+        //     JsonObject json = Json.createObjectBuilder().add("error", "error message").build(); 
+        //     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(json.toString()); 
+        // }
+
+        // create invoice and bind model data
+        Invoice invoice = purchaseSvc.createInvoice(quote, delivery, cart); 
+        model.addAttribute("invoice", invoice); 
+        
+        // clear cart contents 
+        session.invalidate();
 
         return "view3"; 
     }

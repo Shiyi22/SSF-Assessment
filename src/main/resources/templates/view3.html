@@ -8,6 +8,33 @@
 </head>
 <body>
     <h1>Invoice</h1>
+
+    <table>
+        <tr>
+            <td>Invoice: </td>
+            <td>
+                <span data-th-text="${invoice.invoiceId}"></span>
+            </td>
+        </tr>
+        <tr>
+            <td>Name: </td>
+            <td>
+                <span data-th-text="${invoice.name}"></span>
+            </td>
+        </tr>
+        <tr>
+            <td>Address: </td>
+            <td>
+                <span data-th-text="${invoice.address}"></span>
+            </td>
+        </tr>
+        <tr>
+            <td>Total: </td>
+            <td>
+                <span data-th-text="${invoice.total}"></span>
+            </td>
+        </tr>
+    </table>
     
 </body>
 </html>

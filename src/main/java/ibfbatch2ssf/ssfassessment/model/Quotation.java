@@ -1,4 +1,5 @@
 // TODO: Add your package here
+package ibfbatch2ssf.ssfassessment.model;
 
 // DO NOT MODIFY THIS FILE
 
