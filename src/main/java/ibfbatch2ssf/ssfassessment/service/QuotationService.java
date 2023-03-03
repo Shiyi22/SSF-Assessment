@@ -24,7 +24,7 @@ import jakarta.json.JsonReader;
 @Service
 public class QuotationService {
 
-    public String url = "https://quotation.chuklee.com"; 
+    public String url = "https://quotation.chuklee.com/quotation"; 
 
     // method to get quotation
     public Quotation getQuotations(List<String> items) throws Exception {
@@ -70,12 +70,20 @@ public class QuotationService {
 
         // convert JsonObject into Quotation and return 
         quote.setQuoteId(json.getString("quoteId"));
-        JsonObject json2 = json.getJsonObject("quotations"); 
+        JsonArray json2 = json.getJsonArray("quotations"); 
 
-        for (int i = 0; i < items.size(); i++) {
-            String item = items.get(i); 
-            quote.addQuotation(item, Float.parseFloat(json2.getString(item)));
+        // loop thru array 
+        for (int i = 0; i < json2.size(); i++) {
+        
+            JsonObject json3 = json2.getJsonObject(i); 
+            quote.addQuotation(json3.getString("item"), (float) json3.getJsonNumber("unitPrice").doubleValue());
         }
+        
+
+        // for (int i = 0; i < items.size(); i++) {
+        //     String item = items.get(i); 
+        //     quote.addQuotation(item, Float.parseFloat(json3.getString(item)));
+        // }
 
         return quote; 
     }
