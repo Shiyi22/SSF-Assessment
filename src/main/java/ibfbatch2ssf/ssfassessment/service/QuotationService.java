@@ -21,13 +21,14 @@ import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonReader;
 
+
 @Service
 public class QuotationService {
 
     public String url = "https://quotation.chuklee.com/quotation"; 
 
     // method to get quotation
-    public Quotation getQuotations(List<String> items) throws Exception {
+    public Quotation getQuotations(List<String> items) {
 
         Quotation quote = new Quotation(); 
         
@@ -55,9 +56,12 @@ public class QuotationService {
             payload = resp.getBody(); 
             statusCode = resp.getStatusCode().value(); 
         } catch (HttpClientErrorException ex) {
+            
             payload = ex.getResponseBodyAsString();
-            statusCode= ex.getStatusCode().value(); 
-            return quote; // return empty Quotation
+            statusCode= ex.getStatusCode().value();
+            quote.addQuotation("error", (float) statusCode);
+            return quote;  
+            // return quote; // return empty Quotation
         } finally {
             System.out.printf(">>> Status Code: %d\n", statusCode);
             System.out.printf(">>> Payload: %s\n", payload);
@@ -74,16 +78,9 @@ public class QuotationService {
 
         // loop thru array 
         for (int i = 0; i < json2.size(); i++) {
-        
             JsonObject json3 = json2.getJsonObject(i); 
             quote.addQuotation(json3.getString("item"), (float) json3.getJsonNumber("unitPrice").doubleValue());
         }
-        
-
-        // for (int i = 0; i < items.size(); i++) {
-        //     String item = items.get(i); 
-        //     quote.addQuotation(item, Float.parseFloat(json3.getString(item)));
-        // }
 
         return quote; 
     }

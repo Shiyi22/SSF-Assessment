@@ -66,8 +66,6 @@ public class PurchaseOrderController {
         model.addAttribute("item", item); 
         model.addAttribute("cart", cart);        
 
-
-
         return "view1"; 
     }
 
@@ -118,10 +116,10 @@ public class PurchaseOrderController {
         Quotation quote = quotationSvc.getQuotations(items); 
 
         // check for error message
-        // if (quote.getQuoteId().isEmpty()) {
-
-        //     JsonObject json = Json.createObjectBuilder().add("error", "error message").build(); 
-        //     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(json.toString()); 
+        // if (quote.getQuotation("error") != 0.0f) {
+        //     model.addAttribute("error", "Invalid Response"); 
+        //     // JsonObject json = Json.createObjectBuilder().add("error", "error message").build(); 
+        //     return "view2"; 
         // }
 
         // create invoice and bind model data
